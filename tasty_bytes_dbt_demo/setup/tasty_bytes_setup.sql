@@ -1,48 +1,52 @@
-USE ROLE accountadmin;
+USE ROLE DATA_SCIENCE;
 
-CREATE OR REPLACE WAREHOUSE tasty_bytes_dbt_wh
-    WAREHOUSE_SIZE = 'small'
-    WAREHOUSE_TYPE = 'standard'
-    AUTO_SUSPEND = 60
-    AUTO_RESUME = TRUE
-    INITIALLY_SUSPENDED = TRUE
-    COMMENT = 'warehouse for tasty bytes dbt demo';
+-- CREATE OR REPLACE WAREHOUSE tasty_bytes_dbt_wh
+--     WAREHOUSE_SIZE = 'small'
+--     WAREHOUSE_TYPE = 'standard'
+--     AUTO_SUSPEND = 60
+--     AUTO_RESUME = TRUE
+--     INITIALLY_SUSPENDED = TRUE
+--     COMMENT = 'warehouse for tasty bytes dbt demo';
 
-USE WAREHOUSE tasty_bytes_dbt_wh;
+-- USE WAREHOUSE tasty_bytes_dbt_wh;
 
-CREATE DATABASE IF NOT EXISTS tasty_bytes_dbt_db;
-CREATE OR REPLACE SCHEMA tasty_bytes_dbt_db.raw;
-CREATE OR REPLACE SCHEMA tasty_bytes_dbt_db.dev;
-CREATE OR REPLACE SCHEMA tasty_bytes_dbt_db.prod;
+-- CREATE DATABASE IF NOT EXISTS tasty_bytes_dbt_db;
+CREATE OR REPLACE SCHEMA DS_DEV_DB.himanshu_dbt_db_raw;
+-- CREATE OR REPLACE SCHEMA tasty_bytes_dbt_db.dev;
+-- CREATE OR REPLACE SCHEMA tasty_bytes_dbt_db.prod;
 
 
-ALTER SCHEMA tasty_bytes_dbt_db.dev SET LOG_LEVEL = 'INFO';
-ALTER SCHEMA tasty_bytes_dbt_db.dev SET TRACE_LEVEL = 'ALWAYS';
-ALTER SCHEMA tasty_bytes_dbt_db.dev SET METRIC_LEVEL = 'ALL';
+ALTER SCHEMA DS_DEV_DB.himanshu_dbt_db_raw SET LOG_LEVEL = 'INFO';
+ALTER SCHEMA DS_DEV_DB.himanshu_dbt_db_raw SET TRACE_LEVEL = 'ALWAYS';
+ALTER SCHEMA DS_DEV_DB.himanshu_dbt_db_raw SET METRIC_LEVEL = 'ALL';
 
-ALTER SCHEMA tasty_bytes_dbt_db.prod SET LOG_LEVEL = 'INFO';
-ALTER SCHEMA tasty_bytes_dbt_db.prod SET TRACE_LEVEL = 'ALWAYS';
-ALTER SCHEMA tasty_bytes_dbt_db.prod SET METRIC_LEVEL = 'ALL';
+ALTER SCHEMA DS_DEV_DB.himanshu_dbt_db_dev SET LOG_LEVEL = 'INFO';
+ALTER SCHEMA DS_DEV_DB.himanshu_dbt_db_dev SET TRACE_LEVEL = 'ALWAYS';
+ALTER SCHEMA DS_DEV_DB.himanshu_dbt_db_dev SET METRIC_LEVEL = 'ALL';
 
-CREATE OR REPLACE API INTEGRATION git_integration
-  API_PROVIDER = git_https_api
-  API_ALLOWED_PREFIXES = ('https://github.com/')
-  ENABLED = TRUE;
+ALTER SCHEMA DS_DEV_DB.himanshu_dbt_db_prod SET LOG_LEVEL = 'INFO';
+ALTER SCHEMA DS_DEV_DB.himanshu_dbt_db_prod SET TRACE_LEVEL = 'ALWAYS';
+ALTER SCHEMA DS_DEV_DB.himanshu_dbt_db_prod SET METRIC_LEVEL = 'ALL';
 
-CREATE OR REPLACE FILE FORMAT tasty_bytes_dbt_db.public.csv_ff 
+-- CREATE OR REPLACE API INTEGRATION git_integration
+--   API_PROVIDER = git_https_api
+--   API_ALLOWED_PREFIXES = ('https://github.com/')
+--   ENABLED = TRUE;
+
+CREATE OR REPLACE FILE FORMAT DS_DEV_DB.himanshu_dbt_db_raw.csv_ff
 type = 'csv';
 
-CREATE OR REPLACE STAGE tasty_bytes_dbt_db.public.s3load
+CREATE OR REPLACE STAGE DS_DEV_DB.himanshu_dbt_db_raw.s3load
 COMMENT = 'Quickstarts S3 Stage Connection'
 url = 's3://sfquickstarts/frostbyte_tastybytes/'
-file_format = tasty_bytes_dbt_db.public.csv_ff;
+file_format = DS_DEV_DB.himanshu_dbt_db_raw.csv_ff;
 
 /*--
- raw zone table build 
+ raw zone table build
 --*/
 
 -- country table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.country
+CREATE OR REPLACE TABLE DS_DEV_DB.himanshu_dbt_db_raw.country
 (
     country_id NUMBER(18,0),
     country VARCHAR(16777216),
@@ -51,11 +55,11 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.country
     city_id NUMBER(19,0),
     city VARCHAR(16777216),
     city_population VARCHAR(16777216)
-) 
+)
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- franchise table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.franchise 
+CREATE OR REPLACE TABLE DS_DEV_DB.himanshu_dbt_db_raw.franchise
 (
     franchise_id NUMBER(38,0),
     first_name VARCHAR(16777216),
@@ -63,12 +67,12 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.franchise
     city VARCHAR(16777216),
     country VARCHAR(16777216),
     e_mail VARCHAR(16777216),
-    phone_number VARCHAR(16777216) 
+    phone_number VARCHAR(16777216)
 )
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- location table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.location
+CREATE OR REPLACE TABLE DS_DEV_DB.himanshu_dbt_db_raw.location
 (
     location_id NUMBER(19,0),
     placekey VARCHAR(16777216),
@@ -81,7 +85,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.location
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- menu table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.menu
+CREATE OR REPLACE TABLE DS_DEV_DB.himanshu_dbt_db_raw.menu
 (
     menu_id NUMBER(19,0),
     menu_type_id NUMBER(38,0),
@@ -97,8 +101,8 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.menu
 )
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
--- truck table build 
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.truck
+-- truck table build
+CREATE OR REPLACE TABLE DS_DEV_DB.himanshu_dbt_db_raw.truck
 (
     truck_id NUMBER(38,0),
     menu_type_id NUMBER(38,0),
@@ -118,7 +122,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.truck
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- order_header table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.order_header
+CREATE OR REPLACE TABLE DS_DEV_DB.himanshu_dbt_db_raw.order_header
 (
     order_id NUMBER(38,0),
     truck_id NUMBER(38,0),
@@ -140,7 +144,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.order_header
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- order_detail table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.order_detail 
+CREATE OR REPLACE TABLE DS_DEV_DB.himanshu_dbt_db_raw.order_detail
 (
     order_detail_id NUMBER(38,0),
     order_id NUMBER(38,0),
@@ -155,7 +159,7 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.order_detail
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 -- customer loyalty table build
-CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.customer_loyalty
+CREATE OR REPLACE TABLE DS_DEV_DB.himanshu_dbt_db_raw.customer_loyalty
 (
     customer_id NUMBER(38,0),
     first_name VARCHAR(16777216),
@@ -176,40 +180,38 @@ CREATE OR REPLACE TABLE tasty_bytes_dbt_db.raw.customer_loyalty
 COMMENT = '{"origin":"sf_sit-is", "name":"tasty-bytes-dbt", "version":{"major":1, "minor":0}, "attributes":{"is_quickstart":1, "source":"sql"}}';
 
 /*--
- raw zone table load 
+ raw zone table load
 --*/
 
 -- country table load
-COPY INTO tasty_bytes_dbt_db.raw.country
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/country/;
+COPY INTO DS_DEV_DB.himanshu_dbt_db_raw.country
+FROM @DS_DEV_DB.himanshu_dbt_db_raw.s3load/raw_pos/country/;
 
 -- franchise table load
-COPY INTO tasty_bytes_dbt_db.raw.franchise
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/franchise/;
-
+COPY INTO DS_DEV_DB.himanshu_dbt_db_raw.franchise
+FROM @DS_DEV_DB.himanshu_dbt_db_raw.s3load/raw_pos/franchise/;
 -- location table load
-COPY INTO tasty_bytes_dbt_db.raw.location
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/location/;
+COPY INTO DS_DEV_DB.himanshu_dbt_db_raw.location
+FROM @DS_DEV_DB.himanshu_dbt_db_raw.s3load/raw_pos/location/;
 
 -- menu table load
-COPY INTO tasty_bytes_dbt_db.raw.menu
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/menu/;
+COPY INTO DS_DEV_DB.himanshu_dbt_db_raw.menu
+FROM @DS_DEV_DB.himanshu_dbt_db_raw.s3load/raw_pos/menu/;
 
 -- truck table load
-COPY INTO tasty_bytes_dbt_db.raw.truck
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/truck/;
-
+COPY INTO DS_DEV_DB.himanshu_dbt_db_raw.truck
+FROM @DS_DEV_DB.himanshu_dbt_db_raw.s3load/raw_pos/truck/;
 -- customer_loyalty table load
-COPY INTO tasty_bytes_dbt_db.raw.customer_loyalty
-FROM @tasty_bytes_dbt_db.public.s3load/raw_customer/customer_loyalty/;
+COPY INTO DS_DEV_DB.himanshu_dbt_db_raw.customer_loyalty
+FROM @DS_DEV_DB.himanshu_dbt_db_raw.s3load/raw_customer/customer_loyalty/;
 
 -- order_header table load
-COPY INTO tasty_bytes_dbt_db.raw.order_header
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/order_header/;
+COPY INTO DS_DEV_DB.himanshu_dbt_db_raw.order_header
+FROM @DS_DEV_DB.himanshu_dbt_db_raw.s3load/raw_pos/order_header/;
 
 -- order_detail table load
-COPY INTO tasty_bytes_dbt_db.raw.order_detail
-FROM @tasty_bytes_dbt_db.public.s3load/raw_pos/order_detail/;
+COPY INTO DS_DEV_DB.himanshu_dbt_db_raw.order_detail
+FROM @DS_DEV_DB.himanshu_dbt_db_raw.s3load/raw_pos/order_detail/;
 
 -- setup completion note
-SELECT 'tasty_bytes_dbt_db setup is now complete' AS note;
+SELECT 'DS_DEV_DB.himanshu_dbt_db_raw setup is now complete' AS note;
